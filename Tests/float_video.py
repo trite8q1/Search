@@ -56,7 +56,8 @@ var seen=v.checkVisibility?v.checkVisibility({contentVisibilityAuto:true,opacity
 return JSON.stringify({x:r.left,y:r.top,w:r.width,h:r.height,iw:innerWidth,ih:innerHeight,seen:seen,
 scroll:scrollY,playing:!v.paused&&v.readyState>=2,marked:v.hasAttribute('data-office-float'),
 floating:document.documentElement.classList.contains('office-floating'),
-fit:document.documentElement.classList.contains('office-float-fit')})})()"""
+fit:document.documentElement.classList.contains('office-float-fit'),
+ground:getComputedStyle(document.body).backgroundColor})})()"""
 
 
 def script(source, declaration):
@@ -106,7 +107,8 @@ def main():
                 matches = isinstance(said, list) and len(said) == 4 and all(abs(a - b) < 1 for a, b in zip(said, rectangle))
                 t.ok(f"{name}/{scroll}: preparation preserves geometry and playback",
                      matches and same_rect(before, p) and p["scroll"] == before["scroll"]
-                     and p["marked"] and p["floating"] and not p["fit"] and p["playing"], p)
+                     and p["marked"] and p["floating"] and not p["fit"] and p["playing"]
+                     and p["ground"] == "rgb(0, 0, 0)", p)
                 # An old completion must not undo the current lift.
                 stale = restore.replace(REQUEST, "00000000-0000-0000-0000-000000000002")
                 t.ok(f"{name}/{scroll}: stale return is ignored", evaluate(stale) == "obsolete")
@@ -122,7 +124,8 @@ def main():
                 t.ok(f"{name}/{scroll}: return restores layout and playback",
                      same_rect(before, p) and p["scroll"] == before["scroll"]
                      and p["seen"] == before["seen"] and p["playing"]
-                     and not p["marked"] and not p["floating"] and not p["fit"], p)
+                     and not p["marked"] and not p["floating"] and not p["fit"]
+                     and p["ground"] == before["ground"], p)
             evaluate("document.querySelector('video').pause()", "page")
             t.ok(f"{name}: paused video is not isolated", evaluate(isolate) == "none")
             time.sleep(0.4)

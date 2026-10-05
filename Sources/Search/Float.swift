@@ -181,7 +181,8 @@ final class Float {
         page.removeFromSuperview()
         let header: CGFloat = presentation == .page ? 44 : 0
         var cropped = false
-        if presentation == .video, let videoRect,
+        // A pinch-zoomed page no longer maps the script's rectangle to points.
+        if presentation == .video, let videoRect, (page as? WKWebView)?.magnification ?? 1 == 1,
            NSRect(origin: .zero, size: page.bounds.size).contains(videoRect) {
             // The video keeps its existing layout and GPU-layer size. Only
             // this native ancestor scales; resizing PiP need not reflow a page.
@@ -1089,8 +1090,10 @@ enum Isolate {
         (document.head || document.documentElement).appendChild(sheet);
       }
       sheet.textContent = [
+        // Black behind a cropped video's bars too; the rest moves the layout.
+        'html.office-floating, html.office-floating body {background:#000 !important}',
         'html.office-float-fit, html.office-float-fit body {',
-        'background:#000 !important; overflow:hidden !important; margin:0 !important}',
+        'overflow:hidden !important; margin:0 !important}',
         'html.office-floating body > * { visibility:hidden !important }',
         'html.office-floating [data-office-float] {visibility:visible !important}',
         'html.office-float-fit [data-office-float] {',

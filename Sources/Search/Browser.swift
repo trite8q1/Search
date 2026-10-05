@@ -2592,12 +2592,14 @@ final class Browser: NSObject, ObservableObject {
         looked = nil
         // Return cancels a lift still waiting on JavaScript too, including
         // one explicitly requested from the tab that is already selected.
-        if floating == tab.id || Shared.pendingFloat?.tab == tab.id { land() }
+        if Shared.pendingFloat?.tab == tab.id { land() }
         guard tab.id != activeID else { return }
         // The AI panel is about the page it was opened on.
         if assisting != nil { closeAssistant() }
         // Coming back to the tab whose video is out brings it home first, so
-        // it is never lifted and landed in the same breath.
+        // it is never lifted and landed in the same breath. Not the tab you
+        // are on: its menu selects it before Copy Address and the like.
+        if floating == tab.id { land() }
         if floatPrevious { leaving() }
         activeID = tab.id
         tab.touch()
